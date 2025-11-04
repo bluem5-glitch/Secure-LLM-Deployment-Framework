@@ -1,0 +1,41 @@
+    version: '3.5'
+    services:
+      # SERVICE 1: The Local LLM Model Runner
+      ollama:
+        image: ollama/ollama
+        container_name: ollama
+        # CRITICAL: Exposes the model only to the internal machine network for security (localhost)
+        ports:
+          - "127.0.0.1:11434:11434"
+        volumes:
+          # CRITICAL: Ensures model data is stored locally and securely on the host machine
+          - ollama:/root/.ollama
+        restart: always
+
+      # SERVICE 2: The User Interface (Open-WebUI)
+      webui:
+        image: ghcr.io/open-webui/open-webui:main
+        container_name: open-webui
+        # Exposes the UI to the user's browser, accessible only locally
+        ports:
+          - "3000:8080"
+        environment:
+          # Link the UI to the securely hosted local Ollama instance
+          - 'OLLAMA_BASE_URL=http://ollama:11434'
+        volumes:
+          # CRITICAL: Ensures conversation history/data stays local for data privacy
+          - webui:/app/backend/data
+        depends_on:
+          - ollama
+        restart: always
+
+    volumes:
+      ollama:
+      webui:
+    ```
+
+2.  **Write the Security Documentation (`README.md`):** Run this command to open the second file.
+    ```bash
+    open README.md
+    
+
